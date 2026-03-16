@@ -34,12 +34,4 @@ Route::get('/ticket/{id}',[ResidentComplaintController::class,'ticketDetails']);
 
 Route::post('/send-message',[ResidentComplaintController::class,'sendMessage']);
 
-Route::get('/dashboard',function(){
-
-    if(!session('resident_id')){
-        return redirect('/login');
-    }
-
-    return view('dashboard');
-
-});
+Route::get('/dashboard', [ResidentDashboardController::class, 'index']);

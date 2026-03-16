@@ -70,7 +70,7 @@ class ResidentComplaintController extends Controller
 
             $appwrite->databases->createDocument(
                 $appwrite->databaseId(),
-                'complaints_evidence',
+                'complaint_evidence',
                 ID::unique(),
                 [
 
@@ -136,7 +136,7 @@ public function ticketDetails($id)
 
     $evidence = $appwrite->databases->listDocuments(
         $appwrite->databaseId(),
-        'complaints_evidence',
+        'complaint_evidence',
         [
             \Appwrite\Query::equal('complaint_id',[$id])
         ]
