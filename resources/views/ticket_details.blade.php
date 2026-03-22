@@ -1,175 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>Ticket Details</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<title>Ticket Details</title>
 
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, #f8fafc, #e2e8f0);
-            padding-bottom: 90px;
-        }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        .glass-card {
-            background: rgba(255,255,255,0.75);
-            backdrop-filter: blur(15px);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-        }
-
-        .header {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .subtext {
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-
-        .image-preview {
-            width: 100%;
-            border-radius: 16px;
-            margin-top: 10px;
-            object-fit: cover;
-        }
-
-        .chat-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .chat-bubble {
-            padding: 10px 14px;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            max-width: 75%;
-            display: inline-block;
-        }
-
-        .chat-you {
-            background: #3b82f6;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-admin {
-            background: #e5e7eb;
-            color: #111;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-label {
-            font-size: 0.7rem;
-            margin-bottom: 2px;
-        }
-
-        .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(20px);
-            padding: 10px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
-        }
-
-        .message-input {
-            border-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.1);
-            padding: 10px;
-        }
-
-        .send-btn {
-            border-radius: 12px;
-        }
-
-    </style>
 </head>
 
-<body>
+<body class="bg-light">
 
-<div class="container mt-3">
+<div class="container mt-3 mb-4">
 
-    <!-- Ticket Info -->
-    <div class="glass-card">
-        <div class="header">{{ $ticket['title'] }}</div>
-        <div class="subtext">{{ $ticket['category'] }}</div>
+<!-- Ticket Info -->
 
-        <p class="mt-2 mb-1">{{ $ticket['description'] }}</p>
+<div class="card p-3 mb-3 shadow-sm">
 
-        <!-- Image Preview -->
-        @if(!empty($ticket['image']))
-            <img src="{{ asset('storage/' . $ticket['image']) }}" class="image-preview">
-        @endif
-    </div>
+<h5 class="mb-1">{{ $ticket['title'] }}</h5>
 
-    <!-- Conversation -->
-    <div class="glass-card">
-        <div class="header mb-2">💬 Conversation</div>
+<p class="mb-2">{{ $ticket['description'] }}</p>
 
-        <div class="chat-container">
-
-            @forelse($messages as $msg)
-
-                @if($msg['sender_role'] == 'resident')
-                    <div class="text-end mb-2">
-                        <div class="chat-label text-primary">You</div>
-                        <div class="chat-bubble chat-you">
-                            {{ $msg['message'] }}
-                        </div>
-                    </div>
-                @else
-                    <div class="mb-2">
-                        <div class="chat-label text-success">Admin</div>
-                        <div class="chat-bubble chat-admin">
-                            {{ $msg['message'] }}
-                        </div>
-                    </div>
-                @endif
-
-            @empty
-                <p class="text-muted">No messages yet</p>
-            @endforelse
-
-        </div>
-
-    </div>
+<span class="badge bg-warning">
+{{ $ticket['status'] }}
+</span>
 
 </div>
 
-<!-- Message Input -->
-<form method="POST" action="/send-message" class="input-area">
-    @csrf
 
-    <input type="hidden" name="complaint_id" value="{{ $ticket['$id'] }}">
+<!-- Evidence Section -->
 
-    <div class="d-flex gap-2">
-        <textarea 
-            name="message" 
-            class="form-control message-input"
-            rows="1"
-            placeholder="Type your message..."
-            required></textarea>
+<div class="card p-3 mb-3 shadow-sm">
 
-        <button class="btn btn-primary send-btn">
-            Send
-        </button>
-    </div>
+<h6 class="mb-3">📷 Evidence</h6>
+
+@forelse($evidence as $img)
+
+<img 
+src="https://sgp.cloud.appwrite.io/v1/storage/buckets/{{ env('APPWRITE_BUCKET_ID') }}/files/{{ $img['image_id'] }}/view?project={{ env('APPWRITE_PROJECT_ID') }}&mode=admin"
+class="img-fluid rounded mb-3"
+style="max-height:250px; object-fit:cover; cursor:pointer;"
+onclick="openImage(this.src)">
+
+@empty
+
+<p class="text-muted">No evidence uploaded</p>
+
+@endforelse
+
+</div>
+
+
+<!-- Conversation Section -->
+
+<div class="card p-3 mb-3 shadow-sm">
+
+<h6 class="mb-3">💬 Conversation</h6>
+
+<div style="max-height:300px; overflow-y:auto;">
+
+@forelse($messages as $msg)
+
+<div class="mb-2">
+
+@if($msg['sender_role'] == 'resident')
+
+<div class="text-end">
+
+<span class="badge bg-primary">You</span>
+
+<div class="bg-primary text-white p-2 rounded mt-1 d-inline-block">
+{{ $msg['message'] }}
+</div>
+
+</div>
+
+@else
+
+<div>
+
+<span class="badge bg-success">Admin</span>
+
+<div class="bg-light p-2 rounded mt-1 d-inline-block border">
+{{ $msg['message'] }}
+</div>
+
+</div>
+
+@endif
+
+</div>
+
+@empty
+
+<p class="text-muted">No messages yet</p>
+
+@endforelse
+
+</div>
+
+</div>
+
+
+<!-- Message Form -->
+
+<div class="card p-3 shadow-sm">
+
+<form method="POST" action="/send-message">
+
+@csrf
+
+<input type="hidden" name="complaint_id" value="{{ $ticket['$id'] }}">
+
+<textarea 
+name="message" 
+class="form-control mb-2" 
+placeholder="Type your message..." 
+required></textarea>
+
+<button class="btn btn-primary w-100">
+Send Message
+</button>
+
 </form>
 
-</body>
+</div>
 
+
+<!-- Back Button -->
+
+<a href="/tickets" class="btn btn-secondary w-100 mt-3">
+← Back to Tickets
+</a>
+
+</div>
+
+
+<!-- Image Preview Modal -->
+
+<div id="imageModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+justify-content:center;
+align-items:center;
+z-index:9999;
+">
+
+<img id="modalImg" style="max-width:90%; max-height:90%; border-radius:10px;">
+
+</div>
+
+
+<!-- Script -->
+
+<script>
+
+function openImage(src){
+    document.getElementById('imageModal').style.display = 'flex';
+    document.getElementById('modalImg').src = src;
+}
+
+document.getElementById('imageModal').onclick = function(){
+    this.style.display = 'none';
+}
+
+</script>
+
+</body>
 </html>
