@@ -6,7 +6,7 @@ use App\Http\Controllers\ResidentComplaintController;
 use App\Http\Controllers\ResidentAuthController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('login');
 });
 
 
