@@ -88,7 +88,7 @@ class ResidentComplaintController extends Controller
 
     }
 
-    public function tickets()
+   public function tickets()
 {
 
     if(!session('resident_id')){
@@ -105,9 +105,53 @@ class ResidentComplaintController extends Controller
         ]
     );
 
+    $ticketsData = [];
+
+    foreach($tickets['documents'] as $ticket){
+
+        // Get first evidence image (if exists)
+        $evidence = $appwrite->databases->listDocuments(
+            $appwrite->databaseId(),
+            'complaints_evidence',
+            [
+                \Appwrite\Query::equal('complaint_id', [$ticket['$id']]),
+                \Appwrite\Query::limit(1)
+            ]
+        );
+
+        $ticket['preview_image'] = count($evidence['documents']) > 0
+            ? $evidence['documents'][0]['image_id']
+            : null;
+
+        $ticketsData[] = $ticket;
+    }
+
     return view('tickets',[
-        'tickets'=>$tickets['documents']
+        'tickets'=>$ticketsData
     ]);
+
+}
+
+public function deleteTicket($id)
+{
+
+    if(!session('resident_id')){
+        return redirect('/login');
+    }
+
+    $appwrite = new AppwriteService();
+
+    // Delete complaint
+    $appwrite->databases->deleteDocument(
+        $appwrite->databaseId(),
+        'complaints',
+        $id
+    );
+
+    // Optional: delete related evidence + messages
+    // (You can improve later)
+
+    return redirect('/tickets')->with('success','Ticket deleted');
 
 }
 
