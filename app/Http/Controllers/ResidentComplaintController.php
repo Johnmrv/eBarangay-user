@@ -178,4 +178,27 @@ public function sendMessage(Request $request)
 
 }
 
+public function getMessages($id)
+{
+
+    if(!session('resident_id')){
+        return response()->json([]);
+    }
+
+    $appwrite = new AppwriteService();
+
+    $messages = $appwrite->databases->listDocuments(
+        $appwrite->databaseId(),
+        'messages',
+        [
+            \Appwrite\Query::equal('complaint_id', [$id])
+        ]
+    );
+
+    return response()->json($messages['documents']);
+
+}
+
+
+
 }

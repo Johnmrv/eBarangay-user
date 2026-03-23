@@ -59,7 +59,7 @@ onclick="openImage(this.src)">
 
 <h6 class="mb-3">💬 Conversation</h6>
 
-<div style="max-height:300px; overflow-y:auto;">
+<div id="messageBox" style="max-height:300px; overflow-y:auto;">
 
 @forelse($messages as $msg)
 
@@ -108,14 +108,14 @@ onclick="openImage(this.src)">
 
 <div class="card p-3 shadow-sm">
 
-<form method="POST" action="/send-message">
+<form id="messageForm">
 
 @csrf
 
-<input type="hidden" name="complaint_id" value="{{ $ticket['$id'] }}">
+<input type="hidden" id="complaint_id" value="{{ $ticket['$id'] }}">
 
 <textarea 
-name="message" 
+id="messageInput"
 class="form-control mb-2" 
 placeholder="Type your message..." 
 required></textarea>
@@ -162,6 +162,9 @@ z-index:9999;
 
 <script>
 
+let complaintId = "{{ $ticket['$id'] }}";
+
+
 function openImage(src){
     document.getElementById('imageModal').style.display = 'flex';
     document.getElementById('modalImg').src = src;
@@ -170,6 +173,103 @@ function openImage(src){
 document.getElementById('imageModal').onclick = function(){
     this.style.display = 'none';
 }
+
+
+/* LOAD MESSAGES */
+
+function loadMessages(){
+
+fetch("/messages/" + complaintId)
+.then(res => res.json())
+.then(data => {
+
+let box = document.getElementById("messageBox");
+
+box.innerHTML = "";
+
+if(data.length === 0){
+box.innerHTML = "<p class='text-muted'>No messages yet</p>";
+return;
+}
+
+data.forEach(msg => {
+
+let div = document.createElement("div");
+div.classList.add("mb-2");
+
+if(msg.sender_role === "resident"){
+
+div.innerHTML = `
+<div class="text-end">
+<span class="badge bg-primary">You</span>
+<div class="bg-primary text-white p-2 rounded mt-1 d-inline-block">
+${msg.message}
+</div>
+</div>
+`;
+
+}else{
+
+div.innerHTML = `
+<div>
+<span class="badge bg-success">Admin</span>
+<div class="bg-light p-2 rounded mt-1 d-inline-block border">
+${msg.message}
+</div>
+</div>
+`;
+
+}
+
+box.appendChild(div);
+
+});
+
+box.scrollTop = box.scrollHeight;
+
+});
+
+}
+
+
+/* SEND MESSAGE (AJAX) */
+
+document.getElementById("messageForm").addEventListener("submit", function(e){
+
+e.preventDefault();
+
+let message = document.getElementById("messageInput").value;
+
+fetch("/send-message", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+"X-CSRF-TOKEN": "{{ csrf_token() }}"
+},
+body: JSON.stringify({
+complaint_id: complaintId,
+message: message
+})
+})
+.then(() => {
+
+document.getElementById("messageInput").value = "";
+
+loadMessages();
+
+});
+
+});
+
+
+/* AUTO REFRESH */
+
+setInterval(loadMessages, 3000);
+
+
+/* INITIAL LOAD */
+
+loadMessages();
 
 </script>
 

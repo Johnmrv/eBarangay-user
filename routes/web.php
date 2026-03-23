@@ -35,3 +35,7 @@ Route::get('/ticket/{id}',[ResidentComplaintController::class,'ticketDetails']);
 Route::post('/send-message',[ResidentComplaintController::class,'sendMessage']);
 
 Route::get('/dashboard', [ResidentDashboardController::class, 'index']);
+
+
+Route::get('/messages/{id}', [ResidentComplaintController::class, 'getMessages']);
+Route::post('/send-message', [ResidentComplaintController::class, 'sendMessage']);
