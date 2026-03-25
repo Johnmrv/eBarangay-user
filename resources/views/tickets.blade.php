@@ -93,13 +93,11 @@
         <div class="glass-card p-4 mb-3">
 
             @if($ticket['preview_image'])
-
-<img 
-src="https://sgp.cloud.appwrite.io/v1/storage/buckets/{{ env('APPWRITE_BUCKET_ID') }}/files/{{ $ticket['preview_image'] }}/view?project={{ env('APPWRITE_PROJECT_ID') }}&mode=admin"
-class="img-fluid rounded mb-3"
-style="height:120px; width:100%; object-fit:cover;">
-
-@endif
+                <img 
+                src="https://sgp.cloud.appwrite.io/v1/storage/buckets/{{ env('APPWRITE_BUCKET_ID') }}/files/{{ $ticket['preview_image'] }}/view?project={{ env('APPWRITE_PROJECT_ID') }}&mode=admin"
+                class="img-fluid rounded mb-3"
+                style="height:120px; width:100%; object-fit:cover;">
+            @endif
 
             <h5 class="fw-semibold mb-1">{{ $ticket['title'] }}</h5>
 
@@ -109,41 +107,6 @@ style="height:120px; width:100%; object-fit:cover;">
 
             <div class="d-flex justify-content-between align-items-center gap-2">
 
-    <!-- Status -->
-    @php
-        $status = strtolower($ticket['status']);
-    @endphp
-
-    <span class="
-        @if($status == 'pending') badge-pending
-        @elseif($status == 'processing') badge-processing
-        @elseif($status == 'resolved') badge-resolved
-        @endif
-    ">
-        {{ ucfirst($ticket['status']) }}
-    </span>
-
-    <div class="d-flex gap-2">
-
-        <!-- Open -->
-        <a href="/ticket/{{ $ticket['$id'] }}" class="btn btn-primary-glass btn-sm px-3">
-            Open
-        </a>
-
-        <!-- Delete -->
-        <form method="POST" action="/delete-ticket" onsubmit="return confirm('Delete this ticket?')">
-            @csrf
-            <input type="hidden" name="id" value="{{ $ticket['$id'] }}">
-            <button class="btn btn-danger btn-sm px-3">
-                Delete
-            </button>
-        </form>
-
-    </div>
-
-</div>
-
-                <!-- Status -->
                 @php
                     $status = strtolower($ticket['status']);
                 @endphp
@@ -157,10 +120,21 @@ style="height:120px; width:100%; object-fit:cover;">
                     {{ ucfirst($ticket['status']) }}
                 </span>
 
-                <!-- Button -->
-                <a href="/ticket/{{ $ticket['$id'] }}" class="btn btn-glass-primary btn-sm px-4 py-2">
-                    Open
-                </a>
+                <div class="d-flex gap-2">
+
+                    <a href="/ticket/{{ $ticket['$id'] }}" class="btn btn-primary-glass btn-sm px-3">
+                        Open
+                    </a>
+
+                    <form method="POST" action="/delete-ticket" onsubmit="return confirm('Delete this ticket?')">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $ticket['$id'] }}">
+                        <button type="submit" class="btn btn-danger btn-sm px-3">
+                            Delete
+                        </button>
+                    </form>
+
+                </div>
 
             </div>
 
