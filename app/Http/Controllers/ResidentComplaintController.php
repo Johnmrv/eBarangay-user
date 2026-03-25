@@ -50,7 +50,7 @@ class ResidentComplaintController extends Controller
                 "title"=>$request->title,
                 "description"=>$request->description,
                 "category"=>$request->category,
-                "location"=>"Resident Location",
+                "location"=>$request->location ?? "Location not available",
                 "status"=>"Pending",
                 "date_submitted"=>now()->toISOString()
 
@@ -132,8 +132,10 @@ class ResidentComplaintController extends Controller
 
 }
 
-public function deleteTicket($id)
+public function deleteTicket(Request $request)
 {
+
+    $id = $request->id;
 
     if(!session('resident_id')){
         return redirect('/login');
@@ -141,15 +143,11 @@ public function deleteTicket($id)
 
     $appwrite = new AppwriteService();
 
-    // Delete complaint
     $appwrite->databases->deleteDocument(
         $appwrite->databaseId(),
         'complaints',
         $id
     );
-
-    // Optional: delete related evidence + messages
-    // (You can improve later)
 
     return redirect('/tickets')->with('success','Ticket deleted');
 

@@ -147,6 +147,8 @@
                 </div>
             </div>
 
+            <input type="hidden" name="location" id="locationInput">
+
             <!-- Submit -->
             <button class="btn submit-btn w-100 text-white">
                 Submit Complaint
@@ -164,5 +166,38 @@
 </div>
 
 </body>
+
+<script>
+
+function getLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(function(position){
+
+let lat = position.coords.latitude;
+let lng = position.coords.longitude;
+
+// Convert to Google Maps link
+let mapLink = `https://maps.google.com/?q=${lat},${lng}`;
+
+document.getElementById("locationInput").value = mapLink;
+
+}, function(error){
+
+console.log("Location error:", error);
+
+});
+
+}else{
+console.log("Geolocation not supported");
+}
+
+}
+
+// Run automatically when page loads
+getLocation();
+
+</script>
 
 </html>
